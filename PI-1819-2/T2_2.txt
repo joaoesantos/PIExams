@@ -1,0 +1,3 @@
+POST bundles/:name
+
+POST bundles -> optaria por este indo com toda a informação no corpo do pedido
