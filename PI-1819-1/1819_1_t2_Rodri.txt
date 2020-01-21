@@ -1,0 +1,81 @@
+1.a)SEMPRE implementada de forma assincrona
+1.b)PODE implementada de forma sincrona
+1.c)SEMPRE implementada de forma assincrona
+
+2.a)instala todas as dependencias especiicadas no ficheiro package.json
+2.b)instala a dependencia express , o parametro --save é opcional em versoes mais antigas gravava a versao e o nome da dependencia no ficheiro package.json
+2.c)
+instala a dependencia do webpack com a versao 4.27.1
+o parametro --save-dev indica para a versao e o nome desta dependencia serem guardados como dependencieas de desenvolvimento
+o parametro --save-exact indica para a versao sera guardada no package.json com o numero específico e não com o formato default que tipicamente indica um intervalo
+
+4.a)
+o 201 diz respeito a um codigo de criação de um recurso, como este é um pedido GET o codigo de resposta deveria devolver um codigo 200
+as respostas do 400 e do 404 estao trocadas, o 404 diz respetio a um recurso nao encontrado e o 400 a um pedido inválido
+no cado de pedido invalido indica que alguma parte do pedido nao estava de acordo com as especificações, dado
+	que não há corpo do pedido este erro so poderia acontecer devido ao id inserido. Porém a documentação nao apresenta nenhuma informação relativa
+	ao formato correto do pedido. Ou este erro nao pode ocorrer é é necessaria informação relativa ao formato correto/incorreto do id
+4.b)
+	no caso de criação deveria ser devolvido um 201 e nao um 200
+	deveria ser acrescentado um linha com a atualização de sucesso com o codigo 200
+	o pedido invalido deveria ter um codigo 400 e nao 404
+	o método PUT é utilizado para atualizar recursos, pelo que nao deveria ser utilizado para criar e atualizar, para criar o resurco deveria ser utilizado o metodo POST
+	neste caso o 404 faz sentido existir nos casos em que a atualizacao seja feito com o id de um recurso que nao existe
+		no caso de não se usar esta API tambem para a criaçao de recursos
+	no body do pedido deveria estar a representaçao do recurso a atualizar exceto o seu id, que vai no url
+	o 409 nesta caso nao deveria existir
+
+5.a)
+<table >
+    <thead>
+        <tr>
+            {{#each headings as |column|}}
+                <th>{{column}}</th>
+            {{/each}} 
+        </tr>
+    </thead>
+    <tbody>
+        {{#each items as |row|}}
+            <tr>
+                {{#each row as |cell|}}
+                    <td>{{cell}}</td>
+                {{/each}}
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+5.b)
+function listenerOnHeading(th, colIdx) {
+    th.addEventListener('click', listener);
+	
+	let columnName = Object.keys(dataSource[0])[colIdx];
+
+    function listener(e) {
+        dataSource = dataSource.sort((a, b) => {
+            let res = 0;
+            if (a[columnName] > b[columnName]) {
+                res = 1;
+            } else if(b[columnName] > a[columnName]) {
+                res = -1;
+            }
+            return res;
+        });
+        render();
+    }
+}
+
+5.c)
+1 - <input type="submit" value="">
+2 - 'input'
+3 - addEventListener("submit", (ev)
+4 - td.querySelector("input").value
+5 - dataSource[rowIdx]
+6 - Object.keys(item)[colIdx]
+7 - item[prop]
+8 - method: PUT
+headers: new Headers('Content-Type': 'application/json')
+body: JSON.stringify(item)
+9 - url
+10 - alert(resp)
+td.innerHTML = backup[prop]
