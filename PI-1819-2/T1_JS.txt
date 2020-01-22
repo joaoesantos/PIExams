@@ -1,0 +1,21 @@
+//a
+'use strict'
+authenticationMiddleware = function(url) {
+    let authentication = function(req, rsp, next) {
+        if(req.isAuthenticated()){
+            return next();
+        }else{
+            rsp.statusCode = 301;
+            rsp.redirect = url
+        }
+    }
+
+    return authentication;
+}
+
+module.exports = authenticationMiddleware
+
+//b
+app.use('/private/*', validateAuthenticationMw);
+
+
