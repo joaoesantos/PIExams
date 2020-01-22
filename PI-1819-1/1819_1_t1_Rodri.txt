@@ -1,0 +1,171 @@
+1)
+O NodeJs é um runtime single threaded, significa que não ocorrem execuções concorrentes.
+Ao executar codigo sincrono o NodeJs não consegue executar mais nada, impondo limitações de performance.
+
+Em situações onode só haja uma thread de execução pode ser mais simples utilizar API sincronas, e não havendo preocupações de performance 
+pode ser uma implementação viável.
+Outras situações onde poderá fazer sentido APIs sincronas é no caso de determinadas APIs estejam a fazer operações que precisam de ser finalizadas antes do progrma prosseguir.
+Estas operações podem consistir em processamentos no proprio NodeJs ou até em execuçõa de sistemas externos.
+
+2)(nao tenho a certeza, disse o que achava)
+No ato de logout é necessário invalidar o cookie do lado do cliente  atribuind uma data no passado
+e remover a informação da sessão associada a esse cookie, i.e., remover a informação da sessão do lado da aplicação
+Deste modo esse cliente terá o cookie invalidado e mesmo que ese cookieseja utilizado por outro cliente a propria aplicação
+não possui informação de sessao associada a esse cookie.
+
+3)
+Adicionar - /classroom/{id}/student/{student id}
+Remover - /classroom/{id}/student/{student id}
+
+Quer o add quer o remove nao fazem parte dos recursos nem os identificam, pelo que deviam ser retiradas do caminho.
+Além disso o nome da aplicação no url é redundante, e não ajuda a identificar o recurso. pelo que tambem devia ser retirado
+emralaçao ao restante url a ordem clasroom e depois student está bem, porque a operação é feito sobre a classroom mas precisa	
+do recurso student, e ambos os nomes sao seguidos pelos ids que identificam esses recursos
+
+4.a)
+Assumindo que não estamos a contar com o pedido necesário para carregar o ficheiro html mais 4 pedidos http acontecem:
+a para o stylesheet, 1 para a imagem e os outros 2 para os 2 scripts.
+
+4.b)(tetsei com a nossa app e funcionoava assim)
+Sim. O webpack agrupa todos os ficheiros de javascript num unico ficheiro de javascript de nome configuravel nas configurações do webpack.
+Pelo que seria necessário alterar o HTML para utilizar apenas esse ficheiro de javascript em vez do 2 que estao atualmente.
+Com isto em mente o numero de ficheiros de javascript carregados para o browser é apenas 1 pelo que seria feito apenas 1 pedido para script de javscript
+menos 1 do que com o ficheiro original.
+
+5)
+function requestsToList(urls, listID) {
+    let promisses = urls.map(url => fetch(url).then(resp => resp.json()));
+    let list = document.querySelector(`#${listId}`);
+    promisses.forEach(async(p) => {
+        let value = await p;
+        list.innerHTML += `<li>${value}</li>`;
+    });
+}
+
+6)
+function profile(fn) {
+    let newFn = function () {
+        let start = new Date().getTime();
+        let result = fn.apply(null, arguments).then(res => {
+            let end = new Date().getTime();
+            newFn.execs.push(end - start);
+            return res;
+        });
+        return result;
+    }
+    newFn.execs = [];
+    newFn.avgDur = function () {
+        return (newFn.execs.reduce((accum, curr) => accum + curr, 0) / newFn.execs.length);
+    };
+    return newFn;
+}
+
+5)
+server:
+	devem:
+		router
+		importação de dependências
+	nao devem:
+		chamar diretamente os serviços (web-api)
+		validações do formato do pedido (web-api)
+web-api:
+	devem:
+		chamar diretamente os serviços
+		validações do formato do pedido
+	nao devem:
+		implementar lógica de negocio (service)
+		fazer chamadas a football-data e db (service)
+foca-service:
+	devem:
+		implementar lógica de negocio
+		fazer chamadas a football-data e db
+	nao devem:
+		fazer chamadas a API externas
+		fazer chamadas a base de dados (db)
+football-data.js:
+	devem:
+		fazer chamadas a API do football
+		tratar dos erros provenienetes da api externa
+	nao devem:
+		interagir diretamente com o objeto da resposta (web-api)
+		configurar o servidor (server)
+db:
+	devem:
+		fazer chamadas a base de dados
+		tratar dos erros provenientes da base de dados
+	nao devem:
+		interagir diretamente com o objeto do pedido (web-api)
+		verificar autenticação dos pedidos (server)
+
+6.a)
+criar GC
+	POST /gc
+	sucesso: 201
+	insucesso: 400 - bad request
+			   500 - server error
+	resposta: {
+		"id":"<id>",
+		"groups":[
+			<group>,
+			<GC>,
+			//...outros grupos e GCs
+		]
+	}
+remover GC
+	DELETE /gc/{id}
+	sucesso: 204
+	insucesso: 400 - bad request
+			   404 - gc not found
+			   500 - server error
+	resposta: {}
+atualizar GC
+	PUT /gc/{id}
+	sucesso: 201
+	insucesso: 400 - bad request
+			   404 - gc not found
+			   500 - server error
+	resposta: {
+		"id":"<id>",
+		"groups":[
+			<group>,
+			<GC>,
+			//...outros grupos e GCs
+		]
+	}
+buscar GC
+	GET /gc/{id}
+	sucesso: 201
+	insucesso: 400 - bad request
+			   404 - gc not found
+			   500 - server error
+	resposta: {
+		"id":"<id>",
+		"groups":[
+			<group>,
+			<GC>,
+			//...outros grupos e GCs
+		]
+	}
+
+6.b)
+Na camada do server teria de acrescentar estes endpoints novos.
+Na camada da web api, teria de acrescentar um metodo por cada uma das operações que por sua vez chamariam a camada do service.
+Ainda na camada da web api seria validado o formato dos pedidos para garantis que apenas grupos ou outros GC epodem estar num GC.
+Na camada do service teria de acrescentar tambem um metodo por cada operação onde conteria a logica de negocio mencionada acima,
+em relação a grupos poderem constar apenas uma unica vez desse GC.
+Na camada foca-db teria de acrescentar uma metodo por cada operação descrita e fazer validações de dados, como verificar a exsitencia de recursos
+com determinado ID e tambem fazer as operações diretamente com a base de dados.
+Na camada football-data nao é necessario alteraçoes pois estas operaçoes nao envolvem a API externa.
+
+6.c)
+compound-groups.js
+
+let router = require("compound-groups.js");
+router.add("gc");
+router.add("creatingGc");
+router.add("removingGc");
+router.add("updatingGc");
+
+7)
+Atualizar apenas o hash não requere refrssh da página,
+como o conceito de SPA é ter tudo na mesma página utiliza-se o hash para navegar entre os diferentes componentes da pagina
