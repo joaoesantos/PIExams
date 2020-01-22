@@ -1,0 +1,18 @@
+A)
+passportjs, dado a existencia do metodo isAuthenticated
+B) 
+a função vai correr imediatamente?
+tornar num objecto?
+
+let authentication = function( redirectUrl ) {
+return function( req , rsp , next ) {
+if ( req . isAuthenticated ()) {
+return next ();
+}
+rsp . set ({ 'Location' : redirectUrl }). end ()
+}
+}
+
+module . exports = {
+    authentication: authentication,
+}
