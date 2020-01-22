@@ -1,0 +1,149 @@
+1.a)
+
+
+module.exports = function(url) {
+	let mw = function (req, res, next) {
+		if(req.isAuthenticated()){
+			next();
+		} else {
+			res.redirect(url);
+		}
+	}
+	return mw;
+}
+
+1.b)
+
+app.all("/private", validateAuthenticationMw, <a acção associada a este path>)
+app.all("/private/*", validateAuthenticationMw, <a acção associada a este path>)
+
+2.a)
+Não concordo. o metodo GET é o correto mas no caso de aceder a um recurso em especifico deveria ser o nome do recurso e o respetivo id,
+neste caso a acção "getDetails" nao devia estar no url, nao faz parte do recurso nem o identifica
+GET /bundles/:bundleId
+
+2.b)
+Não concordo. emelhante a alinea anterior o metodo esta correto mas a acção "getAll" nao deveria estar presente o url
+por nao fazer parte do recurso nem o identificar
+GET /bundles
+
+2.c)
+Não concordo. o metodo para criar um recurso deveria ser POST e não GET, que nao deve alterar estado da aplicação
+Alem disso e em semelhança as alineas anteriores a acção "create" nao deveria estar no url
+por nao fazer parte do recurso nem o identificar
+POST /bundles/:bundleId
+
+2.d)
+Não concordo. o metodo para remover um recurso deveria ser DELETE e não GET, que nao deve alterar estado da aplicação
+Alem disso e em semelhança as alineas anteriores a acção "create" nao deveria estar no url
+por nao fazer parte do recurso nem o identificar
+DELETE /bundles/:bundleId
+
+2.e)
+Não concordo. o metodo para atualizar um recurso deveria ser PUT, que e utilizado para atualizar recursos, e não GET, que nao deve alterar estado da aplicação
+Alem disso e em semelhança as alineas anteriores a acção "addBook" nao deveria estar no url
+por nao fazer parte do recurso nem o identificar
+Por ultimo como esta acção requere identificar um outro recuro, book, pelo que isso deveria estar explicito no url acrescentando o nome do recurso antes do seu id
+PUT /bundles/:bundleId/books/:bookId
+
+2.f)
+Não concordo. metodo para atualizar um recurso deveria ser PUT, que e utilizado para atualizar recursos, e não GET, que nao deve alterar estado da aplicação
+Alem disso e em semelhança as alineas anteriores a acção "deleteBook" nao deveria estar no url
+por nao fazer parte do recurso nem o identificar
+Por ultimo como esta acção requere identificar um outro recuro, book, pelo que isso deveria estar explicito no url acrescentando o nome do recurso antes do seu id
+PUT /bundles/:bundleId/books/:bookId
+
+3)
+async function getAllBundlesBookTitles () {
+    const bookUrlBase = 'http://localhost:9200/books/book/'
+    let booksTitles = fetch('http://localhost:9200/b4/bundle/_search')
+        .then(response => response.json())
+        .then(bundles => bundles.flatMap(bundle => bundle.books).map(b => fetch(bookUrlBase+b.id)))
+        .then(responses => responses.then(resp => resp.json()))
+        .then(books => books.map(b => b._source.title))
+    return booksTitles ;
+}
+
+4)
+fetch = function() {
+    let originalFetch = fetch;
+    return async (p, o) => {
+        try {
+            let cachedResp = fetch.map[p];
+            if (!cachedResp) {
+                let resp = await originalFetch(p, o);
+                if(resp.headers.has("Cache-Control")
+                && (resp.headers.has("Cache-Control") === "private"
+                || resp.headers.has("Cache-Control") === "public")){
+                    fetch.map[p] = resp;
+                }
+                return resp;
+            } else {
+                return cachedResp;
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
+}();
+fetch.map = {};
+
+5.a)
+GET artists/{name}
+
+resposta:
+{
+	[
+		{
+		"name": <nome do artista>
+		//... outros dados do artista
+		},
+		//... outros artistas
+	]
+}
+
+5.b)
+async function getArtistsNames(nameStart, resultsCount) {
+	try {
+		let headers = new Headers();
+		headers.append("Accept", "application/json");
+		let options {
+			method: "GET",
+			headers: headers
+		}
+		let resp = await fetch("artists/" + nameStart, options);
+		let artistList = await resp.json();
+		if(artistList.length > resultsCount) {
+			artistList = artistList.slice(0, resultsCount);
+		}
+		return artistList;
+	} catch(e) {
+		console.log(e)
+	}
+}
+
+5.c)
+document.querySelector("#artists").addEventListener("change", listener);
+
+async function listener(e) {
+	let input = document.querySelector("#artists");
+	let div = document.querySelector("#suggestions");
+	if(input.value.length < 3) {
+		if(input.className != "hiddenAutoComplete") {
+			input.className = "hiddenAutoComplete";
+		}
+		div.innerHtml = "";
+	} else {
+		if(input.className != "visibleAutoComplete") {
+			input.className = "visibleAutoComplete";
+		}
+		let artists = await getArtistsNames(input.value, 10);
+		let htmlList = "";;
+		artists.forEach(e => {
+			artistList += `<div>${e.name}</div>`;
+		});
+		div.innerHtml = artistList;
+	}
+}
+
+6)nao sei, testei em varios sites e ele carregou a pagina toda outra vez!!
