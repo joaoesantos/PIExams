@@ -1,0 +1,102 @@
+1.a)
+middleware da dependencia express-session, este middle ware permite gerir a informação de sessão de um utilizador na aplicação associada a uma chave que é guardada num cookie do lado do cliente
+middleware do passport com algums configurações, nomeadamente como serializar e desserializar o utilizador no objecto do pedido, como autenticar o utilizador e que estratégia de autenticação utilizar
+middleware da session do passport para automaticamente colocar a informação do utilizador no objeto request associada a sessao em questao
+1.b)
+o metodo set das resposta nao devolve a resposta, pelo que nao pode ser encadeado com o metodo end. 
+para resolver o problema o metodo end deve ser invocado numa linha separada:
+rsp.set(...);
+rsp.end();
+(nao tenho a certeza se e so isto)
+
+2)
+POST /b4/bundles
+
+o metodo post é o indicada para criação de novos recursos segundo a especificação do HTTP, em relação ao URL indica o tipo de recurso a ser criado sem nenhuma identificação
+	associada pois esta identificação é gerada no momento da criaçao do recurso. a informação do recurso a criar será enviada no corpo do pedido
+3.a)
+1 - requests (nao faz sentido!!)
+2 - responseBodies.flatMap(body => body.hits.hits)
+
+3.b)
+let response = await fetch(".../_search");
+let body = await response.json();
+let requests = await body.hits.hits.flatMap(b => b._source.books).map(b => fetch(bookUrlBase + b.id));
+let responses = await requests.map(resp => resp.json());
+return responses.flatMap(body => body.hits.hits).map(b => b._source.title)
+
+4)
+const express = require("express");
+const server = express();
+
+module.exports = function () {
+    let expressServer = {
+        use: function(mw) {
+            server.use(mw);
+        },
+        get: function (path, mw) {
+            server.get(path, mw);
+        },
+        put: function (path, mw) {
+            server.put(path, mw);
+        },
+        delete: function (path, mw) {
+            server.delete(path, mw);
+        },
+        post: function (path, mw) {
+            server.post(path, mw);
+        },
+        start: function(host, port) {
+            server.listen(port, console.log("Server running on port: " + port));
+        }
+    }
+    return expressServer;
+}
+
+5.a)
+PUT /playlists/{playListId}/musics/{musicId}
+
+5.b)
+addMusicToList: async function(req, rsp){
+	try {
+		/*
+			validadores de parametros
+		*/
+		let playlist = yamaService.addMusicToList(req.params.playListId, req.params.musicId);
+		rsp.send(playlist);
+		rsp.end();
+	} catch(e) {
+		if(e.status){
+			rsp.status = e.status;
+		} 
+		rsp.send(e);
+		rsp.end();
+	}
+}
+
+
+5.c)
+addMusicToList: async function(playListId, musicId){
+	let playList = await yamaDb.getPlaylistById(playListId); //devolve a playList pelo ID ou undefined se nao existir
+	if(!playList){
+		let err =  new Error("No playlist with that id");
+		err.status = 404;
+		throw err;
+	}
+	if(playList.allowRepeats || !playList.musics.find(music.id === musicId)) {
+		yamaDb.addGameToList(playListId, musicId)//adiciona uma musica a playlist
+	} else {
+		let err =  new Error("Cannot add repeated music for this playlist");
+		err.status = 500;
+		throw err;
+	}
+}
+
+5.d)
+Como utlizamos uma base de dados nao relacional nao há limitações a nível de acrescentar musicas repetidas
+	do ponto de vista pratica seria acrescentar um objecto, cuja representação já existe em playlist, ao array de musicas num object playlist.
+nas funções que editam dados as verificações de negócio que impossibilitam acrescentar musicas repetidas a uma playlist teriam de ser alteradas para comtemplar que 
+	cada playlist tem um campo que tem de ser valido para se poder acrescentar musicas repetidas ou nao.
+Alem disso é preciso decidir o que fazer em casos que previament permitiam musicas repetidas e as tinham e que entretanto foram alteradas para nao permitir musicas repetidas,
+	será que deixamos as musicas repetidas quando foram adicionadas? ou a partir do momento em que nao e permitido removem-se as repetidas?
+	qualquer uma das abordagens requer logica adicional na camada dos services
