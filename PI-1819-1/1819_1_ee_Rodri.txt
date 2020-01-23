@@ -1,0 +1,92 @@
+1.a) O método POST PODE ser usado para atualizar um recurso
+
+1.b) O método PUT NUNCA deve ser usado para criar um recurso
+
+1.c) Num GET o body tem SEMPRE de ter conteudo, mesmo que esse conteudo seja um objecto, uma vvariavel ou um array vazio
+
+1.d) Num PUT o body PODE pode ir vazio.
+
+1.e) Num DELETE o body da resposta PODE ter conteudo
+
+2.a)
+function nodify(fn) {
+    let olfFn = fn;
+    let newFn = function () {
+        let args = arguments;
+        let lastKey = Object.keys(args)[Object.keys(args).length - 1];
+        let cb = args[lastKey];
+        delete args[lastKey];
+
+        olfFn.apply(null, args).then(r => cb(null, r)).catch(e => cb(e));
+    }
+    return newFn;
+};
+
+2.b)
+Success: true
+Result is 6
+Success: false
+Error is err
+
+3.a)F
+
+3.b)V -> 6
+
+3.c)V
+
+3.d) V -> 3
+
+4.a)F -> ".<nome>" indica uma classs, portanto aplicar-se a a todos os elementos html que tenham a class "table"
+
+4.b)V -> como nao tem pontos aplica-se aos elementes com aquela tag
+
+4.c)F-> "<nome1>.<nome2>" indica um elemento de nome1 com a class de nome 2, peloque se aplica aos eleents de tr com a class even
+
+4.d)F -> "<nome1> <nome2>.<nome3>" indica elementos de nome 2 filhos de elementos de nome 1 que tenham a classe nome 3
+
+-------------------------------------GRUPO 2-----------------------
+1.a)
+GET teams/{name}?max={maxRecords}
+
+1.b)
+async function getTeamNameSuggestions(teamNameStart, teamCount) {
+	let options = {
+        method: "GET",
+        headers: new Headers().append("Accept", "application/json")
+    }
+    let response = await fetch(`teams/${teamNameStart}?max=${teamCount}`, options);
+    if(response.ok){
+        let body = await response.json();
+        return body;
+    } else {
+        return response.status;
+    }
+}
+
+1.c)
+document.querySelector("#teamName").addEventListener("change", listener);
+
+async function listener(e) {
+    let input = document.querySelector("#teamName");
+    let div = document.querySelector("#suggestions");
+    if (input.value.length < 3){
+        if(input.className === "visibleAutoComplete"){
+            input.className = "hiddenAutoComplete";
+        }
+        div.innerHtml = "";
+    } else {
+        if(input.className === "hiddenAutoComplete"){
+            input.className = "visibleAutoComplete";
+        }
+        let teams = getTeamNameSuggestions(input.value, 10);
+        let teamList = "";
+        teams.forEach(t => {
+            teamList += `<div>${t.name}</div>`
+        });
+        div.innerHtml = teamList;
+    }
+    
+}
+
+1.d)Não consigo resolver porque nao conheço a API
+
