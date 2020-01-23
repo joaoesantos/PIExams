@@ -1,3 +1,4 @@
+1
 //a
 'use strict'
 authenticationMiddleware = function(url) {
@@ -19,3 +20,89 @@ module.exports = authenticationMiddleware
 app.use('/private/*', validateAuthenticationMw);
 
 
+2
+a. Obter os detalhes de um grupo - GET /bundles/getDetails/:bundleId
+ GET /bundles/:bundleId
+b. Obter todos os grupos - GET /bundles/getAll
+GET /bundles/
+c. Criar um novo grupo - GET /bundles/create/:bundleId
+POST /bundles
+d. Remover um grupo - GET /bundles/delete/:bundleId
+DELETE /bundles/:bundleID
+e. Adicionar um livro a um grupo - GET /bundles/addBook/:bundleId/:bookId
+PUT /bundles/:bundleId/books/:bookId
+f. Remover um livro a um grupo - GET /bundles/deleteBook/:bundleId/:bookId
+DELETE /bundles/:bundleId/books/:bookId
+
+3.
+async function getAllBundlesBookTitles () {
+let response = await fetch ( 'http://localhost:9200/b4/bundle/_search' )
+let bundles = await response . json ();
+const bookUrlBase = 'http://localhost:9200/books/book/'
+const requests = bundles
+. flatMap ( bundle => bundle . books )
+. map ( b => fetch ( bookUrlBase + b . id ))
+const responses = await Promise . all ( requests );
+const books = await Promise . all ( responses . map ( async resp => await resp . json ()))
+const booksTitles = books . map ( b => b . _source . title )
+return booksTitles ;
+
+const bookUrlBase = 'http://localhost:9200/books/book/'
+let response = 
+    fetch ( 'http://localhost:9200/b4/bundle/_search' )
+    .then(rsp => rsp.json())
+    .then(bundles => bundles.flatMap(bundle => bundle.books).map(b => fetch(bookUrlBase + b.id)))
+    .then(responses => responses.then(resp => resp.json()))
+    .then(books => books.map(b => b._source.title))
+
+return response;
+}
+
+4.
+fetch.cache = {}
+fetch = function(){
+    let originalFetch = fetch;
+    return async function(url, options){
+        let cachedValue = fetch.cache[url];
+        if(cachedValue){
+            return cachedValue
+        }else{
+            let rsp = await originalFetch(url, options)
+
+            if((rsp.headers["Cache-Control"] === "private"|| rsp.headers["Cache-Control"] === "public")){
+                fetch.cache[p] = rsp
+            }
+            return rsp;
+        }
+    }
+}();
+
+
+5
+a
+GET nameSearch/:name
+resposta:
+{
+    searchResult:
+    [
+        //nomes artistas
+	]
+}
+
+b.
+
+let getArtistsNames = async function(nameStart, resultsCount){
+    let headers = new Headers();
+		headers.append("Accept", "application/json");
+		let options {
+			method: "GET",
+			headers: headers
+		}
+    let artists = await fetch('nameSearch/' + nameStart, options)
+    let result = await artists.json();
+    if(result.lenght > resultsCount){
+        return {searchResult: result.slice(0, resultsCount)}
+    }
+
+    return {searchResult: result}
+}
