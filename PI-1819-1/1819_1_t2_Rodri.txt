@@ -2,9 +2,38 @@
 1.b)PODE implementada de forma sincrona
 1.c)SEMPRE implementada de forma assincrona
 
-2.a)instala todas as dependencias especiicadas no ficheiro package.json
-2.b)instala a dependencia express , o parametro --save é opcional em versoes mais antigas gravava a versao e o nome da dependencia no ficheiro package.json
+2.a)
+function promisify(fn) {
+    let oldFn = fn;
+    return async function() {
+        let args = arguments;
+        return new Promise(function(resolve, reject) {
+            let cb = (err, res) => {
+                if(err){
+                    reject(err);
+                } else {
+                    resolve(res);
+                }
+            };
+            args = [].slice.call(args);
+            args.push(cb);
+            oldFn.apply(null, args);
+        });
+    }
+}
+
+2.b)
+Result is 6
+Error is 233
+
 2.c)
+function promisify(fn, instance) {
+
+oldFn.apply(instance? instance : null, args);
+
+3.a)instala todas as dependencias especiicadas no ficheiro package.json
+3.b)instala a dependencia express , o parametro --save é opcional em versoes mais antigas gravava a versao e o nome da dependencia no ficheiro package.json
+3.c)
 instala a dependencia do webpack com a versao 4.27.1
 o parametro --save-dev indica para a versao e o nome desta dependencia serem guardados como dependencieas de desenvolvimento
 o parametro --save-exact indica para a versao sera guardada no package.json com o numero específico e não com o formato default que tipicamente indica um intervalo
