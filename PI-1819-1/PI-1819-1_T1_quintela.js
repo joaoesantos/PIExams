@@ -4,7 +4,7 @@
 //
 //      R: Uma vez que o conceito do NodeJs é ter uma única thread que tem como função a distribuição de trabalho, ter uma API síncrona que poderá bloquear essa única thread é altamente ineficiente.
 //      No entanto o NodeJs possui várias bibliotecas de funções funções síncronas, como é o caso do require(). 
-//      Contudo se a API desenvolvida não tiver operações do tipo I/O e for de execução sequencial e sem hipótese de paralelismo, seria um cenário aceitável.
+//      Contudo se a API desenvolvida não tiver operações do tipo I/O e for de execução sequencial e sem hipótese de concorrencia (single thread), seria um cenário aceitável.
 
 // [2] 
 // Uma aplicação Express configurada com o middleware dado por passport.initialize() , disponibiliza os métodos login() e logout() no objeto Request . 
@@ -118,7 +118,20 @@ const bar = profile(foo)
 //
 //      R:
 function profile(fn) {
- 
+    let newFn = function () {
+        newFn.execs = [];
+        let start = new Date().getTime();
+        let result = fn.apply(null, arguments).then(res => {
+            let end = new Date().getTime();
+            newFn.execs.push(end - start);
+            return res;
+        });
+        return result;
+    }
+    newFn.avgDur = function () {
+        return (newFn.execs.reduce((accum, curr) => accum + curr, 0) / newFn.execs.length);
+    };
+    return newFn;
 }
 
 // [5.2]
@@ -142,6 +155,57 @@ function profile(fn) {
 // sucesso e, caso se aplique, no caso de resposta com insucesso ao pedido.
 //
 //      R:
+//      - obter GC -
+// 	    GET /gc/{id}
+// 	    sucesso: 200 - OK
+// 	    insucesso: 400 - Bad Request
+// 			       404 - Not Found
+// 			       500 - Server Error
+// 	    resposta: {
+// 		    "id":"<id>",
+// 		    "groups":[
+// 			    <group>,
+// 			    <GC>,
+// 			    //...outros grupos e GCs
+// 		    ]
+// 	    }
+//
+//      - criar GC -
+//      POST /gc
+// 	    sucesso: 201 - Created
+// 	    insucesso: 400 - Bad Request
+// 			       500 - Server rror
+// 	    resposta: {
+// 		    "id":"<id>",
+// 		    "groups":[
+// 			    <group>,
+// 			    <GC>,
+// 			    //...outros grupos e GCs
+// 		        ]
+// 	    }
+//
+//      - atualizar GC -
+// 	    PUT /gc/{id}
+// 	    sucesso: 201 - Created
+// 	    insucesso: 400 - Bad Request
+// 			       404 - Not Found
+// 			       500 - Server Error
+// 	    resposta: {
+// 		    "id":"<id>",
+// 		    "groups":[
+// 			    <group>,
+// 			    <GC>,
+// 			    //...outros grupos e GCs
+// 		    ]
+// 	    }
+//
+//      - remover GC -
+// 	    DELETE /gc/{id}
+// 	    sucesso: 204
+// 	    insucesso: 400 - Bad Request
+// 			       404 - Not Found
+// 			       500 - Server Error
+// 	    resposta: {}
 //
 // ○ Para suportar esta funcionalidade, que módulos teria que alterar dos apresentados na questão
 // anterior, e que alterações seriam essas, nomeadamente os métodos a adicionar a cada um dos
@@ -149,6 +213,11 @@ function profile(fn) {
 // NOTA: Descreva apenas as alterações, sem as implementar !
 //
 //      R:
+//      foca-server: adicionar novos os endpoint das operações CRUD
+//      foca-web-api: validar os dados dos pedidos e acrescentar um método para cada uma das operações, que por sua vez chamaria o respectivo serviço
+//      foca-services: acrescentar o respetivo serviço para cada operação CRUD, bem como a lógica de negócio
+//      football-data: não teria de acrescentar nada, porque são operações provenientes de uma api externa
+//      foca-db: teria de implementar métodos para cada operação
 //
 // ○ A componente de cliente desta aplicação é uma Single Page Application (SPA). A implementação
 // do módulo de routing dessa página está na listagem seguinte ( router.js ). Crie um módulo de cliente
@@ -158,6 +227,11 @@ function profile(fn) {
 // mainContentId ; 2) implementadas todas as views e scripts de cliente necessários.
 //
 //      R:
+let router = require("compound-groups.js");
+router.add("/getGC");
+router.add("/postGC");
+router.add("/putGC");
+router.add("/deleteGC");
 
 module . exports = function ( mainContentId ) {
     let mainContent = document . querySelector ( mainContentId )
@@ -182,4 +256,7 @@ module . exports = function ( mainContentId ) {
 
 // [7]
 // Porque motivo as Single Page Applications apenas mudam o hash do URL?
-//      R:
+//
+//      R: 
+//      As SPA permitem fazer uma transição entre os templates carregados sem reload de página. 
+//      Com mudança do hash é possível navegar no conteudo da página, que irão chamar o carregamento dos templates.
