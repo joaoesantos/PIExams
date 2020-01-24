@@ -379,3 +379,218 @@ Object.create(Person) - criar objeto que herda do prototype Person
 Object.prototype.constructor
 Object.keys(obj)
 Object.values(obj)
+----------------------------------------------------------------BONUS
+Iterate obj props
+for(let p in obj)
+{
+	console.log(`${p} : ${obj[p]}`)
+}
+Iterate array
+for(let element of array)
+{
+	newArray.push(func(element))
+}
+deleting property: delete obj.prop
+---------------------------------------------------------------------------------------------------------------
+function reduce(array, func, start)
+{
+    let current = start
+    for(let element of array)
+    {
+        current = func(current, element)
+    }
+    return current
+}
+---------------------------------------------------------------------------------------------------------------
+const array1 = [1, 2, 3];
+const firstElement = array1.shift();
+//Array [2, 3]
+var arr = [1, 2];
+arr.unshift(-2, -1); // = 5
+// arr is [-2, -1, 0, 1, 2]
+retorna comprimento de novo array
+---------------------------------------------------------------------------------------------------------------
+var fs = require('fs');
+ 
+fs.readFile('DATA', 'utf8', function(err, contents) {
+    console.log(contents);
+});
+---------------------------------------------------------------------------------------------------------------
+Arrow function this:
+function Point(x, y){
+    this.x = x
+    this.y = y
+
+    this.add = function(p) {
+        return new Point(this.x + p.x, this.y + p.y)
+    }
+
+    //this.add = p => new Point(this.x + p.x, this.y + p.y)
+}
+let p1 = new Point(5,4)
+console.log(p1.add(p1))
+//Point { x: 10, y: 8, add: [Function] }
+let p2 = new Point(6,5)
+console.log(p2.add(p2))
+//Point { x: 12, y: 10, add: [Function] }
+let f3 = p1.add
+console.log(f3.call(p1,p2))
+//Point { x: 11, y: 9, add: [Function] }
+---------------------------------------------------------------------------------------------------------------
+code executed by setTimeout() is called from an execution
+context separate from the function from which setTimeout was called.
+Default this is global scope, set via apply or bind
+---------------------------------------------------------------------------------------------------------------
+na parte do express:
+	app.get('/', mw1, mw2, rootHandler)
+	o que faz o express.Router()
+	exemplo:
+		const routerBundleApi = require('./web-api')(express.Router(),service)
+		app.use('/bundleApi', routerBundleApi)
+		
+		module.exports = function(router ,service){
+			router.get('/bundles', getBundles)
+			router.get('/', rootHandler)
+			return router;
+			function rootHandler(req, res){
+				res.send("RootHandler")
+			}
+			function getBundles(req, res){
+				res.send("getBundles")
+			}
+		} 
+---------------------------------------------------------------------------------------------------------------
+pending (pendente): Estado inicial, que não foi realizada nem rejeitada.
+fulfilled (realizada): sucesso na operação.
+rejected (rejeitado):  falha na operação.
+settled (estabelecida): Que foi realizada ou rejeitada.
+---------------------------------------------------------------------------------------------------------------
+app.use('/', express.static('public'))
+este middleware permite a pedidos ao servidor aceder a
+conteudos estaticos como imagens e outro ficheiros
+http://localhost:3000/images/kitten.jpg
+se dentro da pasta public extistir este ficheiro
+---------------------------------------------------------------------------------------------------------------
+express-session stores only a session identifier on the client within a cookie and stores the session data on the server
+passport session por o objeto do user no request
+let passportInitializer = (bcrypt, localStrategy, CiborgError) => {
+    function initialize(passport, getUserById) {
+        const authenticateUser = async(userId, password, done) => {
+            try {
+                const userData = await getUserById(userId);
+                const user = userData.body;
+                let isMatch = await bcrypt.compare(password, user.password);
+                if (isMatch) {
+                    return done(null, user);
+                } else {
+                    throw new CiborgError(null,
+                        'Error in passport initializer.',
+                        'Password Incorrect.',
+                        '500' // Internal Server Error
+                    );
+                }
+            } catch (err) {
+                if (!(err instanceof CiborgError)) {
+                    err = new CiborgError(err,
+                        'Error in passport initializer.',
+                        'Unable to login.',
+                        '500' // Internal Server Error
+                    );
+                }
+                console.log(err)
+                done(err);
+            }
+        };
+        passport.use(new localStrategy({
+            usernameField: "userId",
+            passwordField: "password"
+        }, authenticateUser));
+        passport.serializeUser((user, done) => done(null, user.userId));
+        passport.deserializeUser((id, done) => done(null, id));
+    }
+    return initialize;
+}
+---------------------------------------------------------------------------------------------------------------
+resp.set('Set-Cookie', cookieName)
+----------------------------------------------------------------------------------------------------------------
+fetch = function() {
+    let originalFetch = fetch;
+    return async (p, o) => {
+        try {
+            let cachedResp = fetch.map[p];
+            if (!cachedResp) {
+                let resp = await originalFetch(p, o);
+                if(resp.headers.has("Cache-Control")
+                && (resp.headers.has("Cache-Control") === "private"
+                || resp.headers.has("Cache-Control") === "public")){
+                    fetch.map[p] = resp;
+                }
+                return resp;
+            } else {
+                return cachedResp;
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
+}();
+fetch.map = {};
+---------------------------------------------------------------------------------------------------------------
+document.querySelector("#artists").addEventListener("change", listener);
+
+async function listener(e) {
+	let input = document.querySelector("#artists");
+	let div = document.querySelector("#suggestions");
+	if(input.value.length < 3) {
+		if(input.className != "hiddenAutoComplete") {
+			input.className = "hiddenAutoComplete";
+		}
+		div.innerHtml = "";
+	} else {
+		if(input.className != "visibleAutoComplete") {
+			input.className = "visibleAutoComplete";
+		}
+		let artists = await getArtistsNames(input.value, 10);
+		let htmlList = "";;
+		artists.forEach(e => {
+			artistList += `<div>${e.name}</div>`;
+		});
+		div.innerHtml = artistList;
+	}
+}
+---------------------------------------------------------------------------------------------------------------
+function profile(fn) {
+    let newFn = function () {
+        let start = new Date().getTime();
+        let result = fn.apply(null, arguments).then(res => {
+            let end = new Date().getTime();
+            newFn.execs.push(end - start);
+            return res;
+        });
+        return result;
+    }
+    newFn.execs = [];
+    newFn.avgDur = function () {
+        return (newFn.execs.reduce((accum, curr) => accum + curr, 0) / newFn.execs.length);
+    };
+    return newFn;
+}
+---------------------------------------------------------------------------------------------------------------
+function promisify(fn) {
+    let oldFn = fn;
+    return async function() {
+        let args = arguments;
+        return new Promise(function(resolve, reject) {
+            let cb = (err, res) => {
+                if(err){
+                    reject(err);
+                } else {
+                    resolve(res);
+                }
+            };
+            args = [].slice.call(args);
+            args.push(cb);
+            oldFn.apply(null, args);
+        });
+    }
+}
