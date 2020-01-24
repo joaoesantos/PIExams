@@ -1,0 +1,106 @@
+2.
+remove a propriedade req.user e limpa a session de login caso exista uma
+
+3.
+As acçoes não são identificadas no url mas sim na propriedade METHOD do pedido
+● Adicionar - /thoth/classroom/{id}/student/{student id}/add
+PUT /classroom/{id}/student/{student id}
+
+● Remover - /thoth/classroom/{id}/student/{student id}/remove
+ delete /classroom/{id}/student/{student id}
+
+5.
+
+let requestsToList = async function(urls, listID){
+    let element = document.querySelector(`#${listID}`):
+    let requests = urls.map(url => fetch(url).then(rsp => rsp.json()))
+    requests.forEach(
+        async (req) => {
+            let item = await req
+            element.innerHTML += `<li>${item}</li>`
+        }
+    );
+
+}
+
+6.
+
+function profile(fn){
+    let f = function(args){
+        let startCall = now();
+        let result = fn.apply(null, args)
+        .then((res) => {
+            let endCall = now();
+            f.calls.push(endCall - startCall);
+            return res;
+        })
+    }
+
+    f.calls = []
+    f.avgDur = function(){
+        let sum = f.calls.reduce((acc, curr) => acc + curr)
+        return sum / f.calls.length
+    }
+
+    return f
+}
+
+6.
+a)
+//create
+POST /gc/
+    500 server error,
+    400 bad request
+resposta:{
+    groupId: id do grupos,
+    groups: [
+        //grupos
+    ]
+}
+//delete
+delete /gc/:groupId
+    404 resource not found,
+    500 server error,
+    400 bad request
+
+resposta:{
+    message:"group deleted"
+}
+
+//update
+PUT /gc/:groupId
+    404 resource not found,
+    500 server error,
+    400 bad request
+resposta:{
+    groupId: id do grupos,
+    groups: [
+        //grupos
+    ]
+}
+
+//read
+GET /gc/:id/
+sucesso: 200
+insucesso: 
+    404 resource not found,
+    500 server error,
+    400 bad request
+resposta:{
+    groupId: id do grupos,
+    groups: [
+        //grupos
+    ]
+}
+
+c)
+let router = require("router.js");
+
+let compoundFunction = function(){
+    router.add("gc");
+    router.add("creatingGc");
+    router.add("removingGc");
+    router.add("updatingGc");
+}
+
+module.exports = compoundFunction;
