@@ -1,3 +1,4 @@
+// - GRUPO I -
 // [1] 
 // Um programador no desenvolvimento de um módulo NodeJs optou por implementar esse módulo com uma API síncrona. 
 // Justifique se existe algum cenário em que faça sentido esta opção.
@@ -28,14 +29,14 @@
 //  a) Justifique quantos pedidos HTTP resultam do carregamento do seguinte documento HTML no browser:
 //  <html>
 //      <head>
-//          <link rel="stylesheet" href="bootstrap.css"> 
-//          <script src="handlebars.js"></script>
-//          <script src="bookSearch.js"></script>
+//          <link rel="stylesheet" href="bootstrap.css">    - GET 1 -
+//          <script src="handlebars.js"></script>           - GET 2 -
+//          <script src="bookSearch.js"></script>           - GET 3 -
 //      </head>
 //      <body>
 //          <a href="https://www.gutenberg.org/" >
 //              Project Gutenberg
-//              <img src="Gutenberg-logo.png">
+//              <img src="Gutenberg-logo.png">              - GET 4 -
 //          </a>
 //
 //      R: 0 pedidos, os recursos são todos carregados localmente.
@@ -134,6 +135,7 @@ function profile(fn) {
     return newFn;
 }
 
+// - GRUPO II -
 // [5.2]
 // A aplicação FOCA, desenvolvida na 1ª parte do trabalho prático, é constituída pelos módulos apresentados
 // na figura seguinte, bem como as dependências entre cada um destes.

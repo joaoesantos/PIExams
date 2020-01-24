@@ -1,4 +1,4 @@
-
+// - GRUPO I -
 //[1]
 // Dadas as assinaturas das seguintes funções que seguem o idioma comum em NodeJS, classifique numa frase a
 // forma como cada função pode ser implementada no que diz respeito à sua natureza síncrona ou assíncrona. Nessa
@@ -43,12 +43,30 @@ showPromiseResult ( fp ( false , 1 , 2 , 3 ))
 // a. Implemente a função promisify de modo ter o comportamento indicado.
 // NOTA: A função promisify deve funcionar com qualquer função que respeite os requisitos enunciados e não
 // apenas com a função f do exemplo.
-//
-//      R:
-//
+
+function promisify(fn) {
+    return async function() {
+        let args = arguments;
+        return new Promise(function(resolve, reject) {
+            let cb = (err, res) => {
+                if(err){
+                    reject(err);
+                } else {
+                    resolve(res);
+                }
+            };
+            args = [].slice.call(args);
+            args.push(cb);
+            fn.apply(null, args);
+        });
+    }
+}
+
 // b. Indique o output na consola da execução do código na listagem anterior.
 //
 //      R:
+//      Result is 6
+//      Error is err
 //
 // c. A execução do código da listagem seguinte, apresenta na consola o resultado abaixo da listagem:
 

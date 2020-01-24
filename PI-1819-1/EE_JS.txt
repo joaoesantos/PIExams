@@ -1,0 +1,90 @@
+1.
+a) Pode
+b) nunca
+c) nunca
+d) Pode
+e) pode
+
+2
+a)
+function nodify(fn){
+    let original = fn;
+
+    let newFn = function(){
+        let cb = arguments[arguments.length];
+        original
+            .apply(null, arguments.slice(0, arguments.length))
+            .then(res => cb(null, res)).catch(err => cb(err))
+    }
+
+    return newFn
+}
+
+b)
+result is 6
+error is err
+
+3.
+erro
+v 6
+v
+v 3
+
+grupo2
+
+1.
+a)
+
+GET /teams/:name?teamCount=:maxSize
+
+b)
+
+async function getTeamNameSuggestions(teamNameStart, teamCount){
+    try{
+        let options = {
+            method:"GET",
+            headers: new Headers().append("Accept", "application/json")
+        }
+        let teams = await fetch(`/teams/${teamNameStart}?teamCount=${teamCount}`)
+        if(response.ok){
+            return await response.json()
+        }
+
+        return response.status
+    }catch(err){
+        return {response.status = 500}
+    }
+}
+
+c)
+
+let input = document.querySelector("#teamName");
+let suggestions = document.querySelector("#suggestions");
+
+input.addEventListener("change", async function(){
+
+    let val = input.value;
+
+    if(val.length >= 2){
+        let teams = await getTeamNameSuggestions(val, 10)
+        let teamsList = "<ul>";
+
+        teams.forEach( t => teamsList += `<li>${t}</li>`);
+        teamsList += "</ul>"
+        if(suggestions.classList.contains("hiddenAutoComplete");){
+            suggestions.classList.remove("hiddenAutoComplete");
+            suggestions.classList.add("visibleAutoComplete");
+        }
+
+        suggestions.innerHTML = teamsList;
+    }else{
+        if(suggestions.classList.contains("visibleAutoComplete");){
+            suggestions.classList.remove("visibleAutoComplete");
+            suggestions.classList.add("hiddenAutoComplete");
+        }
+
+        suggestions.innerHTML = "";
+    }
+})
+
+
