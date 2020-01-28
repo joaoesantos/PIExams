@@ -77,8 +77,8 @@ module . exports = wacky
 
 // a. require('./wacky')(9).dup(3)      R: F
 // b. require('./wacky').dup(3)         R: V - 6
-// c. require('./wacky')(9)             R: v - 3
-// d. require('./wacky')(9)(3)          R: V - null ???
+// c. require('./wacky')(9)             R: v - function
+// d. require('./wacky')(9)(3)          R: V - 3
 
 
 // [4]
