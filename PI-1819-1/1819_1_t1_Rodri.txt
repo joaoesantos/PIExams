@@ -161,10 +161,22 @@ Na camada football-data nao é necessario alteraçoes pois estas operaçoes nao 
 compound-groups.js
 
 let router = require("compound-groups.js");
-router.add("gc");
-router.add("creatingGc");
-router.add("removingGc");
-router.add("updatingGc");
+router.add({gc:{
+	view: gcView
+	script: gcScript
+}});
+router.add({creatingGc:{
+	view: creatingGcView
+	script: creatingGcScript
+}});
+router.add({removingGc:{
+	view: removingGcView
+	script: removingGcScript
+}});
+router.add({updatingGc:{
+	view: updatingGcView
+	script: updatingGcScript
+}});
 
 7)
 Atualizar apenas o hash não requere refrssh da página,
