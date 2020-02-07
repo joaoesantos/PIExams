@@ -1,0 +1,140 @@
+1.
+Um metodo idempotente implica que este metodo pode ser chamado um numero indeterminado de vezes obtendo sempre o mesmo resultado.
+Como tal esta propriedade é importante para criar uma api tolerante a erros
+2.
+404 corresponde a um recurso não encontrado nao a uma que mudou de localização
+3.
+a)
+addItem nao é visto como uma função
+b)
+assim já imprime o array items,
+como estava dava o erro TypeError: obj.addItem is not a function
+    at eval:11:5
+"use strict";
+function createObj(){
+  const items = []
+  return{
+    addItem : (item) => items.push(item),
+    print: () => items.forEach(x => console.log("item:",x))}
+}
+
+const obj = createObj()
+obj.addItem("slb")
+
+obj.print();
+4.
+Um ficheiro html representa a estrutura da pagina e não o seu aspecto, como tal a font a utilizar num determinado elemento deve ser colocado num ficheiro à parte (css)
+ou na propriedade style do elemento
+
+5.
+a segunda dado que para uma spa é usado o hash que nao força o refresh da pagina
+
+6
+a)
+"use strict";
+function filterProperties(propNames, obj){
+  let result = {}
+  let props = Object.keys(obj)
+
+  props.forEach((p) => {
+    if(propNames.includes(p)){
+      result[p] = obj[p]
+    }
+  })
+
+  return result
+}
+
+b)
+function filterPropertiesN(propNames, objs){
+  return objs.map(o => filterProperties(propNames, o))
+}
+c)
+"use strict";
+let jsonMiddleware = function(req, res, next){
+  req.json = newJson(req, res)
+  next();
+}
+
+function newJson(req, res){
+  let originalJson = res.json();
+  let filter = req.params.filter
+  if(!filter){
+    return originalJson;
+  }
+
+  if(filter instanceof Array){
+    return function() {
+      return filterPropertiesN(filter, res.body)
+    }
+  }else{
+    return function() {
+      return filterProperties(filter, res.body)
+    }
+  }
+}
+
+module.exports = jsonMiddleware
+
+7.
+a usar api assincrona mas a colocar em espera
+
+function get(url, cb){
+    fetch(url),then( resp => cb(null, resp)).catch(err => cb(err))
+}
+
+8
+a)
+POST /groups/:id/games
+
+Pedido:
+{
+    gamesId : [
+        //id dos jogos
+    ]
+}
+
+sucesso: 201
+resposta: {
+    games:{
+        //jogos
+    }
+}
+
+insucesso:
+    codigo: 404 recurso nao encontrado
+    resposta:
+    {
+        Message: "Grupo ou jogos nao encontrados"
+    }
+
+    codigo: 500 Erro de servidor
+    resposta:
+    {
+        Message: "Erro ao aceder ao recurso"
+    }
+
+b)
+let addGamesToGroup = async function(req, rsp) {
+
+    try{
+        let result = await addGamesToGroup(req.params.id, req.body.gamesId)
+        rsp.setHeader('content-type','application/json')
+        rsp.end(result.json())
+
+    } catch(err){
+        rsp.StatusCode = err.StatusCode
+        rsp.setHeader('content-type','application/json')
+        rsp.end(err.json())
+    }
+}
+
+c)
+let addGamesToGroup = async function(groupId, gamesId){
+    let games = await Promise.all(service.getGames(gamesId))
+    let gamesInfo = await Promise.all(games.map(g => service.addGamesToGroup(groupId, g)))
+
+    return {
+        games: gamesInfo
+    }
+}
