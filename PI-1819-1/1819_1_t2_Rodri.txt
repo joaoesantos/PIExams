@@ -95,14 +95,14 @@ function listenerOnHeading(th, colIdx) {
 }
 
 5.c)
-1 - <input type="submit" value="">
+1 - '<input type="text" value="">'
 2 - 'input'
-3 - addEventListener("submit", (ev)
+3 - addEventListener("click", (ev)
 4 - td.querySelector("input").value
 5 - dataSource[rowIdx]
 6 - Object.keys(item)[colIdx]
 7 - item[prop]
-8 - method: PUT
+8 - method: 'PUT'
 headers: new Headers('Content-Type': 'application/json')
 body: JSON.stringify(item)
 9 - url
