@@ -7,7 +7,7 @@ o metodo set das resposta nao devolve a resposta, pelo que nao pode ser encadead
 para resolver o problema o metodo end deve ser invocado numa linha separada:
 rsp.set(...);
 rsp.end();
-(nao tenho a certeza se e so isto)
+(alem disso tens de por o status code que de facto fará o redirect)
 
 2)
 POST /b4/bundles
@@ -31,10 +31,18 @@ const server = express();
 
 module.exports = function () {
     let expressServer = {
-        use: function(mw) {
+        use: function(path, mw) {
+			if(mw === undefined){
+				mw = path;
+				path = "*"
+			}
             server.use(mw);
         },
         get: function (path, mw) {
+			if(mw === undefined){
+				mw = path;
+				path = "*"
+			}
             server.get(path, mw);
         },
         put: function (path, mw) {

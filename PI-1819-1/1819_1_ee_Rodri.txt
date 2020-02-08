@@ -54,7 +54,7 @@ async function getTeamNameSuggestions(teamNameStart, teamCount) {
         method: "GET",
         headers: new Headers().append("Accept", "application/json")
     }
-    let response = await fetch(`teams/${teamNameStart}?max=${teamCount}`, options);
+    let response = await fetch(`teams?name=${teamNameStart}&max=${teamCount}`, options);
     if(response.ok){
         let body = await response.json();
         return body;
