@@ -9,7 +9,7 @@
 // // passport initialization on app
 // ...
 //
-// a.Implemente o módulo validate-auth, de modo a que na variável validateAuthenticationMw fique um
+// a. Implemente o módulo validate-auth, de modo a que na variável validateAuthenticationMw fique um
 // middleware Express que apenas deixa prosseguir pedidos autenticados. Se o pedido não for de um utilizador
 // autenticado, é retornada uma resposta HTTP redirecionando o cliente para o URI recebido como argumento
 // na função exportada pelo módulo.
@@ -24,7 +24,7 @@ module.exports = function(url) {
 	}
 }
 
-// b. Registe o middleware validateAuthenticationMw na aplicação Express , de modo a que apenas
+// b. Registe o middleware validateAuthenticationMw na aplicação Express, de modo a que apenas
 // utilizadores autenticados possam aceder a recursos presentes na path /private ou descendentes,
 // independentemente do tipo de pedido HTTP.
 
@@ -124,13 +124,13 @@ fetch = function() {
     let originalFetch = fetch;
     return async (p, o) => {
         try {
-            let cachedResp = fetch.map[p];
+            let cachedResp = fetch.cache[p];
             if (!cachedResp) {
                 let resp = await originalFetch(p, o);
                 if(resp.headers.has("Cache-Control")
                 && (resp.headers.has("Cache-Control") === "private"
                 || resp.headers.has("Cache-Control") === "public")){
-                    fetch.map[p] = resp;
+                    fetch.cache[p] = resp;
                 }
                 return resp;
             } else {
@@ -141,7 +141,7 @@ fetch = function() {
         }
     }
 }();
-fetch.map = {};
+fetch.cache = {};
 
 
 // - GRUPO 2- 
@@ -158,7 +158,7 @@ fetch.map = {};
 //      R:
 //      GET /artists/{nameStart}?max={resultsCount}
 //
-// b. Implemente a função getArtistsNames(nameStart, resultsCount) que, no browser , realiza um pedido
+// b. Implemente a função getArtistsNames(nameStart, resultsCount) que, no browser, realiza um pedido
 // ao endpoint da alínea anterior para obter a lista das artistas cujo nome começa por nameStart . A lista tem
 // dimensão máxima especificada em resultsCount . A função retorna uma Promise, que quando resolvida
 // produz um objeto com a conversão do JSON obtido na resposta.
