@@ -14,7 +14,7 @@ function _createObj() {
     return { 
         addItem : (e) => Array.prototype.push.call(items, e),
         addItem2: (e) => items.push(e),
-        addItems: (... e) => items.push(e),
+        addItems: (...e) => items.push(e),
         printItems: () => console.log(items),
     };
 }
@@ -29,8 +29,7 @@ _obj.printItems();
 // [6]
 // Implemente as seguintes funções em Javascript
 
-// a.
-// filterProperties(propsNames, obj) que recebe um array de strings em propNames e um
+// a. filterProperties(propsNames, obj) que recebe um array de strings em propNames e um
 // objeto em obj, retornando um novo objeto com as propriedades de obj cujos nomes estão presentes em
 // propNames. Se em propNames existirem nomes que não correspondem a qualquer propiredade em
 // obj, esta propriedade não é adicionada ao objeto.
@@ -53,8 +52,7 @@ let obj_6a = {
 let newObj_6a = filterProperties(propsNames_6a, obj_6a);
 console.log(newObj_6a);
 
-// b.
-// filterPropertiesN(propNames, objs) que recebe um array de strings em propNames e
+// b. filterPropertiesN(propNames, objs) que recebe um array de strings em propNames e
 // um array de objetos em objs, retornando um novo array de objetos correspondente à aplicação da função
 // filterProperties com propNames a cada um dos elementos de objs.Array
 // NOTA: Na implementação desta função, a utilização de qualquer ciclo for/while ou do método
@@ -84,8 +82,7 @@ let objs_6b = [
 let newObjs_6b = filterPropertiesN(propsNames_6b, objs_6b);
 console.log(newObjs_6b);
 
-// c.
-// implemente um middleware Express que substitui o método json() do segundo argumento
+// c. implemente um middleware Express que substitui o método json() do segundo argumento
 // (response), de modo a ter um comportamento especializado quando a query string do uri inclui o nome 
 // filter. Nesse caso, o valor de filter é tomado como uma sequência de strings separadas por vírgulas,
 // filtrando-se a resposta com a função filterProperties ou filterPropertiesN, de modo a que o,
@@ -97,14 +94,14 @@ function mw(req, rsp, next) {
     let ogJson = rsp.json;
 
     rsp.json = function(obj) {
-        let query = req.query;
-        let splitedQuery = query.split(',');
-        if(splitedQuery.includes('filter')) {
+        let filter = req.query.filter;
+        if(filter !== undefined) {
+            let splitedfilter = filter.split(',');
             let newObj = {};
             if(obj instanceof Array)
-                newObj = filterPropertiesN(splitedQuery, obj);
+                newObj = filterPropertiesN(splitedfilter, obj);
             else
-                newObj = filterProperties(splitedQuery, obj);
+                newObj = filterProperties(splitedfilter, obj);
             ogJson.call(rsp, newObj);
         } else {
             ogJson.call(rsp, obj);
@@ -124,8 +121,7 @@ function get(url, cb) {
 }
 
 function _get(url, cb) {
-    let result = null;
-    fetch(url).then(resp => { cb(null, res) }).catch(err =>cb(err))
+    fetch(url).then(resp => { cb(null, resp) }).catch(err =>cb(err))
 }
 
 // - GRUPO 3 -
