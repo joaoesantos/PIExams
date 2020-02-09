@@ -1,0 +1,82 @@
+1) d
+403 e para quem ja esta logado e nao tem permissoes
+
+2)
+F
+V
+F
+V
+
+3)
+F - todos os elementos com a class table
+V
+F - elementos tr com a classe even
+F - todos os td com class first que estejam dentro de um tr e odos os th com class first que estejam dentro de um tr
+
+4)POST 3000/tasks HTTP/1.1 - o port nao pode ser incluido nesta lonha, aoenas no host
+O pedido funcionalmente deveria ser um GET e não um POST, sendo o caso o parametro seria passado no url
+e o codigo que o processaria teria de aceder aos url -> req.params
+
+Content-Type: text/html - funcionalmente este tipo de dados vai ser mais dificil de tratar do lado do cliente
+a menos que a resposta fosse apenas o valor de a e nao incluisse o a.
+Inclluindo o a deveria retratar um formato chave valor
+
+5)
+let restMw = function(method, fn) {
+	let mw = function(req, rsp, next) {
+		let funcName = req.baseUrl.slice(1);
+		if(mw.map[req.method] && mw.map[req.method][funcName]) {
+			try {
+				let func = mw.map[req.method][funcName];
+				let cb = function(err, res) {
+					if(err) {
+						throw err;
+					} else {
+						rsp.json(res);
+					}
+				}
+				let response = func.call(null, cb);
+			} catch(e) {
+				next(e);
+			}
+		} else {
+			next();
+		}
+	}
+	mw.map = {};
+	mw.map[method] = {};
+	mw.map[method][fn.name] = fn
+	mw.add = function(method, fn) {
+		if(!mw.map[method]){
+			mw.map[method] = {};
+		}
+		mw.map[method][fn.name] = fn;
+		return mw;
+	}
+	return mw;
+}
+module.exports = restMw;
+
+6)
+let memMw = function(req, rsp, next) {
+	let method = req.method;
+	let url = req.baseUrl;
+	if(memMw.map[method] && memMw.map[method][url]) {
+		rsp.json(memMw.map[method][url]);
+	} else {
+		let oldJson = rsp.json;
+		res.json = function(obj) {
+			if(!memMw.map[method]){
+				memMw.map[method] = {};
+			}
+			if(!memMw.map[method][url]){
+				memMw.map[method][url] = obj;
+			}
+			oldJson.call(rsp, obj);
+		}
+		next();
+	}
+}
+memMw.map = {};
+
+module.exports = memMw;

@@ -74,8 +74,9 @@ function mw(req, resp, next) {
                 newObj = filterProperties(filters, obj);
             }
             origJson.call(resp, newObj);
+        } else {
+            origJson.call(resp, obj);
         }
-        origJson.call(resp, obj);
     };
 
     
