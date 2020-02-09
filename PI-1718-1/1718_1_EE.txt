@@ -1,0 +1,62 @@
+2)
+let autorouter = {
+	bind: function(app, service) {
+		let map = {}
+		//assumindo que o nome da função tem apenas 1 underscore
+		for(let prop in service) {
+			let funcName = p.split("_");
+			if(!map[funcName[0]]) {
+				map[funcName[0]] = {}
+			}
+			if(!map[funcName[0]]["/" + funcName[1]]) {
+				map[funcName[0]]["/" + funcName[1]] = service[p];
+			}
+		}
+		let mw = function (req, res, next) {
+			let paramNames //vem do tal modulo referido no enunciado
+			if(map[req.method] && map[req.method][req.baseUrl]) {
+				let args = paramNames.map(e => req.query[e]);
+				args.push(res);
+				map[req.method][req.baseUrl].apply(null, args);
+			} else {
+				next();
+			}
+		}
+		ass.use(mw);
+	}
+}
+module.exports = autorouter;
+
+3.a, b, c)
+let async = {
+	compose: function(outer, inner) {
+		return function(arg, cb) {
+			let innerCb = function(err, res) {
+				if(err) {
+					throw err;
+				}
+				outer.call(null, res, cb);
+			}
+			inner.call(null, arg, innerCb);
+		}
+	},
+	
+	waterfallIterative: function(arg, funcs, cb) {
+		let func = funcs[funcs.length-1];
+		for(int i = funcs.length-2; i >= 0; i--) {
+			func = async.compose(func, funcs[i]);
+		}
+		return func;
+	},
+	
+	waterfallRecursive: function(arg, funcs, cb) {
+		if(funcs.length === 2) {
+			return async.compose(func[1], funcs[0]);
+		} else {
+			let funcTemp = funcs[0];
+			let func = async.waterfallRecursive(arg, funcs.slice(1), cb);
+			return async.compose(func[1], funcs[0]);
+		}
+	}
+}
+module.exports = async;
