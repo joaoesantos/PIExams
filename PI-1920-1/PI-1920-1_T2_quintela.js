@@ -14,7 +14,7 @@
 // c. Recurso não encontrado                    R: 404 - Not Found
 // d. Query String com formato incorreto        R: 400 - Bad Request
 // e. Recurso mudou de localização              R: 3xx - Redirection (eg. 301 - Moved Permanently)
-// f. Erro no servidor                          R: 5xx - Server Error (eg. 500 Internal Server Error)
+// f. Erro no servidor                          R: 5xx - Server Error (eg. 500 - Internal Server Error)
 
 // [3]
 // O que é um selector CSS? Apresente exemplos de 3 tipos de seletores diferentes.

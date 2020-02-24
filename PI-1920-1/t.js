@@ -68,7 +68,7 @@ squareInc(2, (err, data) => {
 console.log('---waterfall---')
 async.waterfall(
     2,
-    [inc, square, dup],
+    [inc, inc, inc, inc, inc, inc],
     (err, data) => {
         console.log(
         'dup(square(inc(2))) = ' + data)
