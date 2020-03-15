@@ -73,17 +73,15 @@ app.use(filterReq)
 /////////////////////// filter-request.js //////////////////////////
 'use strict';
 
-let filterReq = function(req, rsp, next, filters) {
-    let body = req.body;
-
-    let newBody = {}
-    if(body instanceof Array)
-        newBody = filterPropertiesN(filters, body);
-    else
-        newBody = filterProperties(filters, body)
-    req.body = newBody;
-
-    next();
+let filterReq = function(filters) {
+    return function(req, rsp, next) {
+        let body = req.body;
+        if(body instanceof Array)
+            req.body = filterPropertiesN(filters, body);
+        else
+            req.body = filterProperties(filters, body)
+        next();
+    }
 }
 module.exports = filterReq;
 ///////////////////////////////////////////////////////////////////
@@ -128,27 +126,27 @@ async function deleteUser(req, rsp) {
     try {
         /* validadores de parâmetros */
         let obj = await ciborg-services.deleteUser(req.params.userId);
-        rsp.statusCode = 200;
-        rsp.SetHeader('Content-type', 'application/json');
-        rsp.json({
-            status : "OK",
-            description : `User with name ${obj.username} and id ${obj.userId} removed and all its data`
-        })
-    } catch(err) { // User Not Found
-        if(err.hasOwnProperty('error')) {
+
+        if(err.hasOwnProperty('error') && err.error === "NOT FOUND") { // User Not Found
             rsp.statusCode = 404;
             rsp.SetHeader('Content-type', 'application/json');
             rsp.json({
                 status : "NOT FOUND",
                 description : `User with name lfalcao and id ${req.params.userId} not found`
             })
-        }
-        else { // Other errors (default Express behaviour)
+        } else {
+            rsp.statusCode = 200;
             rsp.SetHeader('Content-type', 'application/json');
-            rsp.json()
+            rsp.json({
+                status : "OK",
+                description : `User with name ${obj.username} and id ${obj.userId} removed and all its data`
+            })
         }
+    } catch(err) { //  Other errors (default Express behaviour)
+        rsp.statusCode = 500;
+        rsp.SetHeader('Content-type', 'application/json');
+        rsp.json(err)
     }
-
 }
 
 
@@ -192,7 +190,8 @@ window.onload = function() {
                     removeUser(id)
                 } else {
                     // TO DO 4 - start
-                    showErrorStatus(response.status);
+                    let body = await response.json();
+					showErrorStatus(body.description);
                     // TO DO 4 - end
                 }
             }

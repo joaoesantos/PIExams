@@ -39,7 +39,6 @@
 //              <img src="Gutenberg-logo.png">              - GET 4 -
 //          </a>
 //
-//      R: 0 pedidos, os recursos são todos carregados localmente.
 //
 // b) Justifique se a utilização do webpack pode ajudar a reduzir o número de pedidos HTTP de 4.a?
 //
@@ -47,10 +46,12 @@
 //      Sim, porque o webpack é um empacotador (encapsulador) de módulos estáticos, mas apenas se estes dependerem uns dos outros.
 //      Ao processar a aplicação o webpack gera um gráfico que mapeia cada módulo e suas dependências e gera um ou mais pacotes.
 //
-// b) Em caso afirmativo quais as modificações necessárias no front-end mantendo o mesmo comportamento de 4.a)
+//    Em caso afirmativo quais as modificações necessárias no front-end mantendo o mesmo comportamento de 4.a)
 //
 //      R:
-//      ???
+//      Pelo que seria necessário alterar o HTML para utilizar apenas esse ficheiro de javascript em vez do 2 que estao atualmente.
+//      Com isto em mente o numero de ficheiros de javascript carregados para o browser é apenas 1 pelo que seria feito apenas 1 pedido para script de javscript
+//      menos 1 do que com o ficheiro original.
 
 // [5]
 // Implemente a função requestsToList(urls, listID) que realiza um pedido HTTP para cada um dos
